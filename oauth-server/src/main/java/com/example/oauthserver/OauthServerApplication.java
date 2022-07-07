@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class OauthServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OauthServerApplication1.class, args);
+        SpringApplication.run(OauthServerApplication.class, args);
     }
 
 }
