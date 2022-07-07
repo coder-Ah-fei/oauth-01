@@ -27,6 +27,7 @@ public class MessagesController {
 
 	@GetMapping("/messages")
 	public String[] getMessages() {
+		System.out.println("getMessages is done");
 		return new String[] {"Message 1", "Message 2", "Message 3"};
 	}
 }

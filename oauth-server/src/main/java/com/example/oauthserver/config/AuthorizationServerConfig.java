@@ -20,6 +20,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -50,11 +51,18 @@ import java.util.UUID;
 public class AuthorizationServerConfig {
 	private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
 
+	@Autowired
+	private JpaOAuth2AuthorizationConsentService oAuth2AuthorizationConsentService;
+	@Autowired
+	private JpaOAuth2AuthorizationService oAuth2AuthorizationService;
+
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 		OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
 				new OAuth2AuthorizationServerConfigurer<>();
+
+
 		authorizationServerConfigurer
 				.authorizationEndpoint(authorizationEndpoint ->
 						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
@@ -72,42 +80,46 @@ public class AuthorizationServerConfig {
 				exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
 			)
 			.apply(authorizationServerConfigurer);
+
+		authorizationServerConfigurer.authorizationConsentService(oAuth2AuthorizationConsentService)
+				.authorizationService(oAuth2AuthorizationService)
+		;
 		return http.build();
 	}
 
 	// @formatter:off
-	@Bean
-	public RegisteredClientRepository registeredClientRepository() {
-		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("messaging-client")
-				.clientSecret("{noop}secret")
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.redirectUri("http://yang1.com:8080/login/oauth2/code/messaging-client-oidc")
-				.redirectUri("http://yang1.com:8080/authorized")
-				.scope(OidcScopes.OPENID)
-				.scope("message.read")
-				.scope("message.write")
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-				.build();
-		RegisteredClient registeredClient2 = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("messaging-client2")
-				.clientSecret("{noop}secret2")
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.redirectUri("http://yang1.com:8081/login/oauth2/code/messaging-client-oidc2")
-				.redirectUri("http://yang1.com:8081/authorized")
-				.scope(OidcScopes.OPENID)
-				.scope("message.read")
-				.scope("message.write")
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-				.build();
-		return new InMemoryRegisteredClientRepository(registeredClient, registeredClient2);
-	}
+//	@Bean
+//	public RegisteredClientRepository registeredClientRepository() {
+//		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//				.clientId("messaging-client")
+//				.clientSecret("{noop}secret")
+//				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+//				.redirectUri("http://yang1.com:8080/login/oauth2/code/messaging-client-oidc")
+//				.redirectUri("http://yang1.com:8080/authorized")
+//				.scope(OidcScopes.OPENID)
+//				.scope("message.read")
+//				.scope("message.write")
+//				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//				.build();
+//		RegisteredClient registeredClient2 = RegisteredClient.withId(UUID.randomUUID().toString())
+//				.clientId("messaging-client2")
+//				.clientSecret("{noop}secret2")
+//				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+//				.redirectUri("http://yang1.com:8081/login/oauth2/code/messaging-client-oidc2")
+//				.redirectUri("http://yang1.com:8081/authorized")
+//				.scope(OidcScopes.OPENID)
+//				.scope("message.read")
+//				.scope("message.write")
+//				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+//				.build();
+//		return new InMemoryRegisteredClientRepository(registeredClient, registeredClient2);
+//	}
 	// @formatter:on
 
 	@Bean
@@ -122,10 +134,10 @@ public class AuthorizationServerConfig {
 		return ProviderSettings.builder().issuer("http://yang2.com:9000").build();
 	}
 
-	@Bean
-	public OAuth2AuthorizationConsentService authorizationConsentService() {
-		// Will be used by the ConsentController
-		return new InMemoryOAuth2AuthorizationConsentService();
-	}
+//	@Bean
+//	public OAuth2AuthorizationConsentService authorizationConsentService() {
+//		// Will be used by the ConsentController
+//		return new InMemoryOAuth2AuthorizationConsentService();
+//	}
 
 }
