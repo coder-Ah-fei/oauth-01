@@ -19,6 +19,7 @@
         <module>oauth-server</module>
         <module>oauth-client</module>
         <module>messages-server</module>
+        <module>security-demo</module>
     </modules>
 
     <properties>

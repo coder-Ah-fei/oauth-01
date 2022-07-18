@@ -43,6 +43,12 @@ public class AuthorizationConsentController {
 		this.authorizationConsentService = authorizationConsentService;
 	}
 
+
+//	@GetMapping(value = "/loginform")
+//	public String toLogin(){
+//		return "loginform";
+//	}
+
 	@GetMapping(value = "/oauth2/consent")
 	public String consent(Principal principal, Model model,
 			@RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
